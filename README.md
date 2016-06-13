@@ -1,5 +1,7 @@
 # hackalod
 
+http://www.edtestic.nl/goudvis
+
 This repo is the result from participating on the HACK-A-LOD open-data for the National Library of the Netherlands (Hague).
 We won 2nd prize with this, so yay.
 
