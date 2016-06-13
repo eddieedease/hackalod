@@ -1,0 +1,21 @@
+<div class="jumbotron" ng-show="nav" style="word-wrap: break-word;">
+  <div aria-label="First group" class="btn-group" role="group">
+    <button class="btn btn-primary" ng-click="setsubject('vluchteling')" type="button">Vluchteling</button>
+    <button class="btn btn-primary" ng-click="setsubject('crisis')" type="button">Crisis</button>
+    <button class="btn btn-primary" ng-click="setsubject('privacy')" type="button">Privacy</button>
+    <button class="btn btn-primary" ng-click="setsubject('verstedelijking')" type="button">Verstedelijking</button>
+  </div><br>
+  <div aria-label="First group" class="btn-group" role="group">
+    <button class="btn btn-primary" ng-click="setsubject('klimaatverandering')" type="button">Klimaatverandering</button>
+    <button class="btn btn-primary" ng-click="setsubject('migratie')" type="button">Migratie</button>
+    <button class="btn btn-primary" ng-click="setsubject('terrorisme')" type="button">Terrorisme</button>
+    <button class="btn btn-primary" ng-click="setsubject('europa')" type="button">Europa</button>
+  </div><hr>
+  <hr>
+  <p></p>
+</div>
+<div ng-show="de">
+  <h2>{{titel}}</h2>
+  <svg id="graph"></svg>
+
+</div>

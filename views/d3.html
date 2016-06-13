@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Can I haz experimentz</title>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <style type="text/css">
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #graph {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: -1;
+    }
+
+    circle {
+      stroke: #fff;
+    }
+
+    circle:hover {
+      opacity: 0.5;
+    }
+
+    text {
+      font: 24px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="graph"></svg>
+  <script type="text/javascript">
+    var w = parseInt(d3.select("#graph").style("width")),
+      h = parseInt(d3.select("#graph").style("height"));
+    var svg = d3.select("body").append("svg:svg").attr("width", w).attr("height", h);
+    //Set up tooltip
+
+    var data = [{
+      "datum": 1990,
+      "source": 0,
+      "author": "test1"
+    }, {
+      "datum": 1965,
+      "source": 1,
+      "author": "test2"
+    }, {
+      "datum": 1970,
+      "source": 2,
+      "author": "test3"
+    }, {
+      "datum": 1962,
+      "source": 1,
+      "author": "test4"
+    }, {
+      "datum": 1951,
+      "source": 2,
+      "author": "test5"
+    }, {
+      "datum": 1990,
+      "source": 0,
+      "author": "test6"
+    }, {
+      "datum": 1970,
+      "source": 1,
+      "author": "test7"
+    },
+    {
+      "datum": 1970,
+      "source": 1,
+      "author": "test7"
+    },
+    {
+      "datum": 1970,
+      "source": 1,
+      "author": "test7"
+    },
+    {
+      "datum": 1970,
+      "source": 3,
+      "author": "test7"
+    },
+    {
+      "datum": 1970,
+      "source": 1,
+      "author": "test7"
+    },
+    {
+      "datum": 1970,
+      "source": 1,
+      "author": "test7"
+    },
+      {
+        "datum": 1970,
+        "source":2,
+        "author": "test7"
+      },
+      {
+        "datum": 1970,
+        "source": 2,
+        "author": "test7"
+      },{
+      "datum": 1965,
+      "source": 3,
+      "author": "test8"
+    }, {
+      "datum": 1990,
+      "source": 1,
+      "author": "test9"
+    }, ];
+    //source bijv 0 krant, 1 tijdschrift, 2 politiek, 3 journaal
+    var datumOb = data.map(function(obj) {
+      return obj.datum;
+    });
+    var past = Math.min.apply(null, datumOb);
+    var present = Math.max.apply(null, datumOb);
+    //console.log(past + " " + present);
+    function onlyUnique(value, index, self) {
+      return self.indexOf(value) === index;
+    }
+
+    var unique = datumOb.filter(onlyUnique);
+    //console.log(unique);
+
+    data.sort(function(a, b) {
+      return a.datum - b.datum;
+    });
+    console.log(data);
+
+    var width = w,
+      height = h,
+      padding = 6, // separation between nodes
+      maxRadius = 12;
+
+    var n = d3.sum(data), // total number of nodes
+      m = unique.length; // number of distinct clusters
+
+    console.log(n + "   " + m);
+
+    var color = [];
+    for (var c = 0; c < m; c++) {
+      color[c] = d3.rgb(Math.random() * 100, Math.random() * 255, Math.random() * 155);
+    }
+
+    var x = d3.scale.ordinal()
+      .domain(d3.range(m))
+      .rangePoints([0, width], 1);
+
+unique.sort();
+
+    var nodes = [];
+    var increment = 0;
+    //Add the SVG Text Element to the svgContainer
+var text = svg.selectAll("text")
+                        .data(unique)
+                        .enter()
+                        .append("text");
+
+var textLabels = text
+                         .attr("x", function(d,i) { return x(i)-50;})
+                         .attr("y", height / 4 *3)
+                         .text( function(d,i) { return unique[i];})
+                         .attr("font-family", "sans-serif")
+                         .attr("font-size", "10px")
+                         ;
+
+    for (var j = 0; j < data.length; j++) {
+      if (j == 0) {
+        nodes[j] = {
+          author: data[j].author,
+          radius: maxRadius,
+          color: color[data[j].source],
+          cx: x(increment),
+          cy: height / 2
+        };
+      } else if (data[j].datum != data[j - 1].datum) {
+        increment++;
+        nodes[j] = {
+          author: data[j].author,
+          radius: maxRadius,
+          color: color[data[j].source],
+          cx: x(increment),
+          cy: height / 2
+        };
+
+      } else {
+        nodes[j] = {
+          author: data[j].author,
+          radius: maxRadius,
+          color: color[data[j].source],
+          cx: x(increment),
+          cy: height / 2
+        };
+      }
+    }
+
+
+
+    var force = d3.layout.force()
+      .nodes(nodes)
+      .size([width, height])
+      .gravity(0)
+      .charge(0)
+      .on("tick", tick)
+      .start();
+
+    var circle = svg.selectAll("circle")
+      .data(nodes)
+      .enter().append("circle")
+      .attr("r", function(d) {
+        return d.radius;
+      })
+      .style("fill", function(d) {
+        return d.color;
+      })
+      .call(force.drag);
+
+    /*circle.append("text")
+      .text(function(d) {
+        //console.log(d.author);
+        return d.author;
+      })
+      .style("font-size", 12)
+      .attr("x", "15px")
+    ;*/
+
+    function tick(e) {
+      circle
+        .each(gravity(.1 * e.alpha))
+        .each(collide(.5))
+        .attr("cx", function(d) {
+          return d.x;
+        })
+        .attr("cy", function(d) {
+          return d.y;
+        });
+    }
+
+    // Move nodes toward cluster focus.
+    function gravity(alpha) {
+      return function(d) {
+        d.y += (d.cy - d.y) * alpha;
+        d.x += (d.cx - d.x) * alpha;
+      };
+    }
+
+    // Resolve collisions between nodes.
+    function collide(alpha) {
+      var quadtree = d3.geom.quadtree(nodes);
+      return function(d) {
+        var r = d.radius + maxRadius + padding,
+          nx1 = d.x - r,
+          nx2 = d.x + r,
+          ny1 = d.y - r,
+          ny2 = d.y + r;
+        quadtree.visit(function(quad, x1, y1, x2, y2) {
+          if (quad.point && (quad.point !== d)) {
+            var x = d.x - quad.point.x,
+              y = d.y - quad.point.y,
+              l = Math.sqrt(x * x + y * y),
+              r = d.radius + quad.point.radius + (d.color !== quad.point.color) * padding;
+            if (l < r) {
+              l = (l - r) / l * alpha;
+              d.x -= x *= l;
+              d.y -= y *= l;
+              quad.point.x += x;
+              quad.point.y += y;
+            }
+          }
+          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+        });
+      };
+    }
+  </script>
+</body>
+
+</html>
